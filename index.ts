@@ -1,38 +1,65 @@
-import fs from 'fs';
-import { promisify } from 'util';
+import {
+  Parser,
+  SwaggerSchema,
+  OverallProps,
+  MethodType,
+  PathProps,
+  Path,
+} from './Parser';
+import { flatten, readFile, writeFile } from './utils';
 
-import { Parser, SwaggerSchema, OverallProps } from './Parser';
-import { flatten } from './utils';
+export interface Plugin {
+  main: (
+    overallProps: OverallProps,
+  ) => (
+    urlPath: [string, Path],
+  ) => (methodPathProps: [MethodType, PathProps]) => string;
+  imports: string[];
+}
 
-const readFile = promisify(fs.readFile);
-const writeFile = promisify(fs.writeFile);
+interface GenerateArgs {
+  schemaPath: string;
+  plugin: Plugin;
+}
 
-import userConf from './gen';
-
-(async () => {
+export async function generate({ schemaPath, plugin }: GenerateArgs) {
   try {
     const petSchema = JSON.parse(
-      await readFile('./data-models/petstore-simple.json', 'utf-8'),
+      await readFile(schemaPath, 'utf-8'),
     ) as SwaggerSchema;
 
     const parser = new Parser(petSchema);
 
+    // Using main
+    //const overallProps: OverallProps = { basePath, host };
+    //const mainIter = generateArgs.main(overallProps);
+    //const imports = generateArgs.imports;
+    //const gen = Object.entries(paths).map(mainIter);
+    //const content = flatten<string>(gen);
+    //writer({ imports, content });
+
+    // Using plugin
+    debugger;
     const { basePath, host, paths } = parser.schema;
+    const { main, imports } = plugin;
 
-    const overallProps: OverallProps = { basePath, host };
+    const urlPathFunc = main({ basePath, host });
 
-    const mainIter = userConf.main(overallProps);
-    const imports = userConf.imports;
+    const urlPathList = Object.entries(paths);
 
-    const gen = Object.entries(paths).map(mainIter);
+    const methPathPropsFunc = urlPathList.map(urlPathFunc);
 
-    const content = flatten<string>(gen);
+    const generatedStuff = urlPathList.map(([, path]) =>
+      Object.entries(path).map((methPath, idx) =>
+        methPathPropsFunc[idx](methPath as any),
+      ),
+    );
 
-    writer({ imports, content });
+    debugger;
   } catch (err) {
     console.error(err);
   }
-})();
+}
 
 interface WriterArgs {
   imports: string[];

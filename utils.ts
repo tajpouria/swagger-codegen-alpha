@@ -1,3 +1,6 @@
+import fs from 'fs';
+import { promisify } from 'util';
+
 export function flatten<T = string>(arr: any, depth: number = 1): T[] {
   return depth > 0
     ? arr.reduce(
@@ -7,3 +10,6 @@ export function flatten<T = string>(arr: any, depth: number = 1): T[] {
       )
     : arr;
 }
+
+export const readFile = promisify(fs.readFile);
+export const writeFile = promisify(fs.writeFile);

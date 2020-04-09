@@ -1,2 +1,4 @@
 *.lock
 node_modules/
+data-models/gd.json
+*.lock

@@ -7,7 +7,7 @@ export interface Paths {
 }
 
 export type Path = {
-  [method in methodType]: PathProps;
+  [method in MethodType]: PathProps;
 };
 
 export interface PathProps {
@@ -18,7 +18,7 @@ export interface PathProps {
   };
 }
 
-export type methodType = 'get' | 'post' | 'put' | 'delete' | 'patch';
+export type MethodType = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
 type ParameterType = 'query' | 'path' | 'body';
 

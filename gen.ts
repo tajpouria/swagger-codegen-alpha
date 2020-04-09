@@ -9,15 +9,15 @@ export default {
         switch (method) {
           case 'get':
             return `function ${operationId}() {
-            return axios.get(${host}${basePath}${url});
+            return axios.get('${host}${basePath}${url}');
           }`;
           case 'post':
             return `function ${operationId}() {
-            return axios.post(${host}${basePath}${url}, {body: 1})
+            return axios.post('${host}${basePath}${url}', {body: 1})
           }`;
           case 'delete':
             return `function ${operationId}() {
-            return axios.delete(${host}${basePath}${url}, {body: 1})
+            return axios.delete('${host}${basePath}${url}', {body: 1})
           }`;
         }
       });
