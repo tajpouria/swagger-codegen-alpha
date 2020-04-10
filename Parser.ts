@@ -32,6 +32,28 @@ export class Parser {
   public get schema() {
     return this._schema;
   }
+
+  public convertURLPathParametersToTemplateStringVar = () => {
+    const newPaths: Paths = {};
+
+    Object.entries(this._schema.paths).forEach(([url, path]) => {
+      let urlTemp = url;
+
+      const containPathParamRegex = /\/{\w+}/gi;
+
+      if (containPathParamRegex.test(url)) {
+        const braceAfterSlashRegex = /\/{\b/g;
+
+        urlTemp = urlTemp.replace(braceAfterSlashRegex, '/${');
+      }
+
+      newPaths[urlTemp] = path;
+    });
+
+    this._schema.paths = newPaths;
+
+    return this;
+  };
 }
 
 export interface OverallProps {

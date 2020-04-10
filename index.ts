@@ -19,10 +19,15 @@ export interface Plugin {
 
 interface GenerateArgs {
   schemaPath: string;
+  generatedFilePath: string;
   plugin: Plugin;
 }
 
-export async function generate({ schemaPath, plugin }: GenerateArgs) {
+export async function generate({
+  schemaPath,
+  generatedFilePath,
+  plugin,
+}: GenerateArgs) {
   try {
     const petSchema = JSON.parse(
       await readFile(schemaPath, 'utf-8'),
@@ -39,8 +44,12 @@ export async function generate({ schemaPath, plugin }: GenerateArgs) {
     //writer({ imports, content });
 
     // Using plugin
-    debugger;
-    const { basePath, host, paths } = parser.schema;
+    const {
+      basePath,
+      host,
+      paths,
+    } = parser.convertURLPathParametersToTemplateStringVar().schema;
+
     const { main, imports } = plugin;
 
     const urlPathFunc = main({ basePath, host });
@@ -49,29 +58,48 @@ export async function generate({ schemaPath, plugin }: GenerateArgs) {
 
     const methPathPropsFunc = urlPathList.map(urlPathFunc);
 
-    const generatedStuff = urlPathList.map(([, path]) =>
+    const content = urlPathList.map(([, path]) =>
       Object.entries(path).map((methPath, idx) =>
         methPathPropsFunc[idx](methPath as any),
       ),
     );
 
-    debugger;
+    const w = new Writer({ imports, generatedFilePath, content });
+
+    await w.write();
   } catch (err) {
     console.error(err);
   }
 }
 
-interface WriterArgs {
+interface WriterProps {
   imports: string[];
-  content: string[];
+  generatedFilePath: string;
+  content: string[] | string[][];
 }
 
-async function writer({ imports, content }: WriterArgs) {
-  const tmp = `${imports.join('\n')}\n${content.join('\n')}`;
+class Writer {
+  private fileStuff: string[] = [];
 
-  try {
-    await writeFile('./apis.js', tmp, { encoding: 'utf-8' });
-  } catch (err) {
-    console.error(err);
+  constructor(private props: WriterProps) {
+    const { imports, content } = props;
+
+    this.fileStuff.push(imports.join('\n'));
+    this.fileStuff.push(flatten(content).join('\n\n').replace(/('|")/g, '`'));
+  }
+
+  async write() {
+    const {
+      props: { generatedFilePath },
+      fileStuff,
+    } = this;
+
+    try {
+      await writeFile(generatedFilePath, fileStuff.join('\n\n'), {
+        encoding: 'utf-8',
+      });
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
