@@ -17,58 +17,60 @@ export interface Plugin {
   imports: string[];
 }
 
-interface GenerateArgs {
+interface GeneratorProps {
   schemaPath: string;
   generatedFilePath: string;
   plugin: Plugin;
 }
 
-export async function generate({
-  schemaPath,
-  generatedFilePath,
-  plugin,
-}: GenerateArgs) {
-  try {
-    const petSchema = JSON.parse(
-      await readFile(schemaPath, 'utf-8'),
-    ) as SwaggerSchema;
+export class Generator {
+  constructor(private generatorProps: GeneratorProps) {}
 
-    const parser = new Parser(petSchema);
+  public async generate() {
+    const { schemaPath, generatedFilePath, plugin } = this.generatorProps;
 
-    // Using main
-    //const overallProps: OverallProps = { basePath, host };
-    //const mainIter = generateArgs.main(overallProps);
-    //const imports = generateArgs.imports;
-    //const gen = Object.entries(paths).map(mainIter);
-    //const content = flatten<string>(gen);
-    //writer({ imports, content });
+    try {
+      const petSchema = JSON.parse(
+        await readFile(schemaPath, 'utf-8'),
+      ) as SwaggerSchema;
 
-    // Using plugin
-    const {
-      basePath,
-      host,
-      paths,
-    } = parser.convertURLPathParametersToTemplateStringVar().schema;
+      const parser = new Parser(petSchema);
 
-    const { main, imports } = plugin;
+      // Using main
+      //const overallProps: OverallProps = { basePath, host };
+      //const mainIter = generateArgs.main(overallProps);
+      //const imports = generateArgs.imports;
+      //const gen = Object.entries(paths).map(mainIter);
+      //const content = flatten<string>(gen);
+      //writer({ imports, content });
 
-    const urlPathFunc = main({ basePath, host });
+      // Using plugin
+      const {
+        basePath,
+        host,
+        paths,
+      } = parser.convertURLPathParametersToTemplateStringVar().schema;
 
-    const urlPathList = Object.entries(paths);
+      const { main, imports } = plugin;
 
-    const methPathPropsFunc = urlPathList.map(urlPathFunc);
+      const urlPathFunc = main({ basePath, host });
 
-    const content = urlPathList.map(([, path]) =>
-      Object.entries(path).map((methPath, idx) =>
-        methPathPropsFunc[idx](methPath as any),
-      ),
-    );
+      const urlPathList = Object.entries(paths);
 
-    const w = new Writer({ imports, generatedFilePath, content });
+      const methPathPropsFunc = urlPathList.map(urlPathFunc);
 
-    await w.write();
-  } catch (err) {
-    console.error(err);
+      const content = urlPathList.map(([, path]) =>
+        Object.entries(path).map((methPath, idx) =>
+          methPathPropsFunc[idx](methPath as any),
+        ),
+      );
+
+      const w = new Writer({ imports, generatedFilePath, content });
+
+      await w.write();
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 
@@ -78,13 +80,14 @@ interface WriterProps {
   content: string[] | string[][];
 }
 
-class Writer {
+export class Writer {
   private fileStuff: string[] = [];
 
   constructor(private props: WriterProps) {
     const { imports, content } = props;
+    const { addedByHelpers } = Writer;
 
-    this.fileStuff.push(imports.join('\n'));
+    this.fileStuff.push([...imports, ...addedByHelpers.imports].join('\n'));
     this.fileStuff.push(flatten(content).join('\n\n').replace(/('|")/g, '`'));
   }
 
@@ -102,4 +105,13 @@ class Writer {
       console.error(err);
     }
   }
+
+  static addedByHelpers: AddedByHelpersProps = { imports: new Set() };
+
+  static addImports = (newimport: string) =>
+    Writer.addedByHelpers.imports.add(newimport);
+}
+
+interface AddedByHelpersProps {
+  imports: Set<string>;
 }

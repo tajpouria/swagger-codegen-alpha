@@ -12,10 +12,12 @@ export type Path = {
 
 export interface PathProps {
   operationId?: string;
-  parameters: {
-    name: string;
-    in: ParameterType;
-  };
+  parameters: Parameter[];
+}
+
+export interface Parameter {
+  name: string;
+  in: ParameterType;
 }
 
 export type MethodType = 'get' | 'post' | 'put' | 'delete' | 'patch';
