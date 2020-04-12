@@ -1,3 +1,9 @@
+export interface OverallProps {
+  basePath: string;
+  host: string;
+  tags?: string[];
+}
+
 export interface SwaggerSchema extends OverallProps {
   paths: Paths;
 }
@@ -12,7 +18,9 @@ export type Path = {
 
 export interface PathProps {
   operationId?: string;
+  summary?: string;
   parameters: Parameter[];
+  tags?: string[];
 }
 
 export interface Parameter {
@@ -56,9 +64,4 @@ export class Parser {
 
     return this;
   };
-}
-
-export interface OverallProps {
-  basePath: string;
-  host: string;
 }
