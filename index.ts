@@ -1,12 +1,13 @@
 import {
   Parser,
-  SwaggerSchema,
   OverallProps,
   MethodType,
   PathProps,
   Path,
+  SwaggerSchema,
 } from './Parser';
-import { flatten, readFile, writeFile } from './utils';
+import { flatten, writeFile, RequireOnlyOne } from './utils';
+import { schemaProvider } from './schemaProvider';
 
 export interface Plugin {
   main: (
@@ -17,34 +18,34 @@ export interface Plugin {
   imports: string[];
 }
 
-interface GeneratorProps {
-  schemaPath: string;
-  generatedFilePath: string;
-  plugin: Plugin;
-}
+type GeneratorProps = RequireOnlyOne<
+  {
+    schemaURL: string;
+    schemaPath: string;
+    generatedFilePath: string;
+    plugin: Plugin;
+  },
+  'schemaPath' | 'schemaURL'
+>;
 
 export class Generator {
   constructor(private generatorProps: GeneratorProps) {}
 
   public async generate() {
-    const { schemaPath, generatedFilePath, plugin } = this.generatorProps;
+    const {
+      schemaPath,
+      generatedFilePath,
+      plugin,
+      schemaURL,
+    } = this.generatorProps;
 
     try {
-      const petSchema = JSON.parse(
-        await readFile(schemaPath, 'utf-8'),
+      const jsonSchema = JSON.parse(
+        await schemaProvider({ schemaPath, schemaURL }),
       ) as SwaggerSchema;
 
-      const parser = new Parser(petSchema);
+      const parser = new Parser(jsonSchema);
 
-      // Using main
-      //const overallProps: OverallProps = { basePath, host };
-      //const mainIter = generateArgs.main(overallProps);
-      //const imports = generateArgs.imports;
-      //const gen = Object.entries(paths).map(mainIter);
-      //const content = flatten<string>(gen);
-      //writer({ imports, content });
-
-      // Using plugin
       const {
         basePath,
         host,

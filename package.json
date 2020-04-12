@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "debug": "node --inspect-brk -r ts-node/register genConf.ts"
+    "debug": "node --inspect-brk -r ts-node/register gdGenConf.ts"
   },
   "devDependencies": {
     "@types/node": "^13.11.0",

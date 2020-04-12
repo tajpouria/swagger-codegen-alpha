@@ -1,6 +1,9 @@
 import fs from 'fs';
 import { promisify } from 'util';
 
+import http from 'http';
+import https from 'https';
+
 export function flatten<T = string>(arr: any, depth: number = 1): T[] {
   return depth > 0
     ? arr.reduce(
@@ -13,3 +16,42 @@ export function flatten<T = string>(arr: any, depth: number = 1): T[] {
 
 export const readFile = promisify(fs.readFile);
 export const writeFile = promisify(fs.writeFile);
+
+export type RequireOnlyOne<T, Keys extends keyof T = keyof T> = Pick<
+  T,
+  Exclude<keyof T, Keys>
+> &
+  {
+    [K in Keys]-?: Required<Pick<T, K>> &
+      Partial<Record<Exclude<Keys, K>, undefined>>;
+  }[Keys];
+
+export const getRequest = async (
+  url: string,
+  postData?: Record<string, any>,
+) => {
+  const lib = url.startsWith('https://') ? https : http;
+  return new Promise((resolve, reject) => {
+    const req = lib.get(url, res => {
+      if (res?.statusCode! < 200 || res?.statusCode! >= 300) {
+        return reject(new Error(`Status Code: ${res.statusCode}`));
+      }
+
+      const data: any[] = [];
+
+      res.on('data', chunk => {
+        data.push(chunk);
+      });
+
+      res.on('end', () => resolve(Buffer.concat(data).toString()));
+    });
+
+    req.on('error', reject);
+
+    if (postData) {
+      req.write(postData);
+    }
+
+    req.end();
+  });
+};
