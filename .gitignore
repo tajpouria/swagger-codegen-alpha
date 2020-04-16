@@ -1,6 +1,3 @@
 *.lock
 node_modules/
 *.lock
-
-data-models/gd.json
-custom-gd-plugin/

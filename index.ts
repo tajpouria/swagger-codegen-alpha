@@ -47,28 +47,30 @@ export class Generator {
       const parser = new Parser(jsonSchema);
 
       const {
-        basePath,
         host,
+        basePath,
         paths,
       } = parser.convertURLPathParametersToTemplateStringVar().schema;
 
       const { main, imports } = plugin;
 
-      const urlPathFunc = main({ basePath, host });
+      const urlPathFunc = main({ host, basePath });
 
       const urlPathList = Object.entries(paths);
 
-      const methPathPropsFunc = urlPathList.map(urlPathFunc);
+      const methodPathPropsFuncList = urlPathList.map(urlPathFunc);
 
-      const content = urlPathList.map(([, path]) =>
-        Object.entries(path).map((methPath, idx) =>
-          methPathPropsFunc[idx](methPath as any),
+      const content = urlPathList.map(([, path], idx) =>
+        Object.entries(path).map(methodPathProps =>
+          methodPathPropsFuncList[idx](
+            methodPathProps as [MethodType, PathProps],
+          ),
         ),
       );
 
       const w = new Writer({ imports, generatedFilePath, content });
 
-      await w.write();
+      w.write();
     } catch (err) {
       console.error(err);
     }
