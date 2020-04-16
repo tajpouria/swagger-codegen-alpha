@@ -1,25 +1,28 @@
 import { Plugin } from '..';
-import { useQueryParmas } from '../plugin-helpers';
+import { useQueryParmas, useAddToFile } from '../plugin-helpers';
 
 interface CostomGdPluginProps {
   tagNamesToInclude: string[];
+  generatedDirectroyPath: string;
 }
 
-export default function ({ tagNamesToInclude }: CostomGdPluginProps): Plugin {
+export default function ({
+  tagNamesToInclude,
+  generatedDirectroyPath,
+}: CostomGdPluginProps): Plugin {
   return {
     main: ({ host, basePath }) => ([url, path]) => ([method, pathProps]) => {
+      const addToFile = useAddToFile(generatedDirectroyPath);
       const { tags } = pathProps;
 
-      if (tags?.some(tag => tagNamesToInclude.includes(tag))) {
-        console.log(url, method);
-        switch (method) {
-          case 'get':
-            return '';
+      tags?.forEach(tag => {
+        if (tagNamesToInclude.includes(tag)) {
+          addToFile(`${tag}.js`, `${url}-${method}`);
         }
-      }
-
-      return '';
+      });
     },
-    imports: [],
+    imports: [
+      `import { APIVersionController } from 'src/controller/APIVersionController';`,
+    ],
   };
 }

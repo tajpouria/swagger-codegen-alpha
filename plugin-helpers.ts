@@ -1,5 +1,7 @@
+import path from 'path';
+
 import { Parameter } from './Parser';
-import { Writer } from '.';
+import { SingletonWriterPropsProvider } from './SingletonWriterPropsProvider';
 
 export function useQueryParmas(parameters: Parameter[]): [string[], string] {
   const queryParams: string[] = [];
@@ -11,7 +13,24 @@ export function useQueryParmas(parameters: Parameter[]): [string[], string] {
     '',
   )}})}`;
 
-  Writer.addImports("import qs from 'qs'");
+  SingletonWriterPropsProvider.addImports("import qs from 'qs'");
 
   return [queryParams, consumeQueryParams];
 }
+
+export const useAddToFile = (addAllToDirectoryPath?: string) => (
+  toAddFilePath: string,
+  toAddContent: string | string[] | string[][],
+) => {
+  if (addAllToDirectoryPath) {
+    SingletonWriterPropsProvider.addWriteContent(
+      path.resolve(addAllToDirectoryPath, toAddFilePath),
+      toAddContent,
+    );
+  } else {
+    SingletonWriterPropsProvider.addWriteContent(
+      path.resolve(toAddFilePath),
+      toAddContent,
+    );
+  }
+};
