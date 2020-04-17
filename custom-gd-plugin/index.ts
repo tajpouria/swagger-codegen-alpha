@@ -1,5 +1,5 @@
 import { Plugin } from '..';
-import { useQueryParmas, useAddToFile } from '../plugin-helpers';
+import { useQueryParmas, useAddToFile, wrap } from '../plugin-helpers';
 
 interface CostomGdPluginProps {
   tagNamesToInclude: string[];
@@ -25,12 +25,14 @@ export default function ({
               addToFile(
                 FILE_NAME,
 
-                `// @query
-                ${METHOD_NAME} = (key, params: ${METHOD_NAME}Props) => {
-                const { apiCaller, makeURL } = this;
+                wrap(
+                  `// @query
+                  ${METHOD_NAME} = (key, params: ${METHOD_NAME}Props) => {`,
+                  `const { apiCaller, makeURL } = this;
 
-                return apiCaller().get(makeURL('${url}', { params }));
-            };`,
+                   return apiCaller().get(makeURL('${url}', { params }));`,
+                  `}`,
+                ),
               );
               break;
 
@@ -38,13 +40,14 @@ export default function ({
               addToFile(
                 FILE_NAME,
 
-                `// @mutation
-                ${METHOD_NAME} = (body: ${METHOD_NAME}Props) => {
-                const { apiCaller, makeURL } = this;
-
-                return apiCaller().post(makeURL('${url}'), body);
-                };
-                `,
+                wrap(
+                  `// @mutation
+                  ${METHOD_NAME} = (body: ${METHOD_NAME}Props) => {`,
+                  `const { apiCaller, makeURL } = this;
+                    
+                  return apiCaller().post(makeURL('${url}'), body);`,
+                  `}`,
+                ),
               );
               break;
 
@@ -52,14 +55,31 @@ export default function ({
               addToFile(
                 FILE_NAME,
 
-                `// @mutation
-              ${METHOD_NAME} = (body: ${METHOD_NAME}Props) => {
-              const { apiCaller, makeURL } = this;
-
-              return apiCaller().put(makeURL('${url}'), body);
-              };
-            `,
+                wrap(
+                  `// @mutation
+                  ${METHOD_NAME} = (body: ${METHOD_NAME}Props) => {`,
+                  `const { apiCaller, makeURL } = this;
+                    
+                  return apiCaller().put(makeURL('${url}'), body);`,
+                  `}`,
+                ),
               );
+              break;
+
+            case 'delete':
+              addToFile(
+                FILE_NAME,
+
+                wrap(
+                  `// @mutation
+                  ${METHOD_NAME} = (body: ${METHOD_NAME}Props) => {`,
+                  `const { apiCaller, makeURL } = this;
+                    
+                  return apiCaller().put(makeURL('${url}'), { params });`,
+                  `}`,
+                ),
+              );
+              break;
           }
         }
       });

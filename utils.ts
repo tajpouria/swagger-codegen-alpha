@@ -1,8 +1,8 @@
 import fs from 'fs';
-import { promisify } from 'util';
-
 import http from 'http';
 import https from 'https';
+import { promisify } from 'util';
+import crypto from 'crypto';
 
 export function flatten<T = string>(arr: any, depth: number = 1): T[] {
   return depth > 0
@@ -55,3 +55,9 @@ export const getRequest = async (
     req.end();
   });
 };
+
+export const isObject = (value: any) =>
+  value && typeof value === 'object' && value.constructor === Object;
+
+export const createMd5 = (data: string) =>
+  crypto.createHash('md5').update(data).digest('hex');

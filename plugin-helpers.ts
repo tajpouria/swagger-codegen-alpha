@@ -20,7 +20,7 @@ export function useQueryParmas(parameters: Parameter[]): [string[], string] {
 
 export const useAddToFile = (addAllToDirectoryPath?: string) => (
   toAddFilePath: string,
-  toAddContent: string | string[] | string[][],
+  toAddContent: string | string[] | WrappedObject,
 ) => {
   if (addAllToDirectoryPath) {
     SingletonWriterPropsProvider.addWriteContent(
@@ -34,3 +34,19 @@ export const useAddToFile = (addAllToDirectoryPath?: string) => (
     );
   }
 };
+
+export const wrap = (
+  wrapperStartWith: string,
+  toWrapContent: string | string[],
+  wrapperEndWith: string,
+): WrappedObject => ({
+  wrapperStartWith,
+  wrapperEndWith,
+  toWrapContent,
+});
+
+export interface WrappedObject {
+  wrapperStartWith: string;
+  wrapperEndWith: string;
+  toWrapContent: string | string[];
+}
