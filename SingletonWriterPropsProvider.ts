@@ -3,7 +3,7 @@ import { flatten } from './utils';
 
 export abstract class SingletonWriterPropsProvider {
   static imports: Set<string> = new Set();
-  static writeContent: WriteContent = {};
+  static writeContent: WriteContent = new Map();
 
   static addImports = (newimport: string | string[]) => {
     if (Array.isArray(newimport)) {
@@ -19,7 +19,7 @@ export abstract class SingletonWriterPropsProvider {
   ) => {
     const { writeContent } = SingletonWriterPropsProvider;
 
-    const prevFileContent = writeContent[toAddFilePath];
+    const prevFileContent = writeContent.get(toAddFilePath);
 
     let toAddContentTemp = toAddContent;
 
@@ -28,13 +28,15 @@ export abstract class SingletonWriterPropsProvider {
     }
 
     if (prevFileContent) {
-      SingletonWriterPropsProvider.writeContent[
-        toAddFilePath
-      ] = prevFileContent.concat('\n\n').concat(toAddContentTemp);
+      SingletonWriterPropsProvider.writeContent.set(
+        toAddFilePath,
+        prevFileContent.concat('\n\n').concat(toAddContentTemp),
+      );
     } else {
-      SingletonWriterPropsProvider.writeContent[
-        toAddFilePath
-      ] = toAddContentTemp;
+      SingletonWriterPropsProvider.writeContent.set(
+        toAddFilePath,
+        toAddContentTemp,
+      );
     }
   };
 

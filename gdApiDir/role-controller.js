@@ -1,17 +1,51 @@
-import { APIVersionController } from 'src/controller/APIVersionController';
+// @flow
+import { APIVersionController } from "src/controller/APIVersionController";
 
-/v1/role-get
+// @query
+getById = (key, params: getByIdProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/role-post
+  return apiCaller().get(makeURL("/v1/role", { params }));
+};
 
-/v1/role-put
+// @mutation
+add = (body: addProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/role-delete
+  return apiCaller().post(makeURL("/v1/role"), body);
+};
 
-/v1/role/editRolePermissions-put
+// @mutation
+edit = (body: editProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/roles-get
+  return apiCaller().put(makeURL("/v1/role"), body);
+};
 
-/v1/roles/changeStatus-put
+// @mutation
+editRolePermissions = (body: editRolePermissionsProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/roles/getByFilter-get
+  return apiCaller().put(makeURL("/v1/role/editRolePermissions"), body);
+};
+
+// @query
+getAll = (key, params: getAllProps) => {
+  const { apiCaller, makeURL } = this;
+
+  return apiCaller().get(makeURL("/v1/roles", { params }));
+};
+
+// @mutation
+changeStatus = (body: changeStatusProps) => {
+  const { apiCaller, makeURL } = this;
+
+  return apiCaller().put(makeURL("/v1/roles/changeStatus"), body);
+};
+
+// @query
+getByFilter = (key, params: getByFilterProps) => {
+  const { apiCaller, makeURL } = this;
+
+  return apiCaller().get(makeURL("/v1/roles/getByFilter", { params }));
+};

@@ -1,21 +1,65 @@
-import { APIVersionController } from 'src/controller/APIVersionController';
+// @flow
+import { APIVersionController } from "src/controller/APIVersionController";
 
-/v1/channel-get
+// @query
+getChannel = (key, params: getChannelProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/channel-post
+  return apiCaller().get(makeURL("/v1/channel", { params }));
+};
 
-/v1/channel-put
+// @mutation
+add = (body: addProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/channel-delete
+  return apiCaller().post(makeURL("/v1/channel"), body);
+};
 
-/v1/channel/assignApiToChannel-put
+// @mutation
+edit = (body: editProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/channel/getConsumers-get
+  return apiCaller().put(makeURL("/v1/channel"), body);
+};
 
-/v1/channel/unAssignApiToChannel-put
+// @mutation
+assignApiToChannel = (body: assignApiToChannelProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/channels-get
+  return apiCaller().put(makeURL("/v1/channel/assignApiToChannel"), body);
+};
 
-/v1/channels/changeStatus-put
+// @query
+getChannelConsumers = (key, params: getChannelConsumersProps) => {
+  const { apiCaller, makeURL } = this;
 
-/v1/channels/getByFilter-get
+  return apiCaller().get(makeURL("/v1/channel/getConsumers", { params }));
+};
+
+// @mutation
+unAssignApiToChannel = (body: unAssignApiToChannelProps) => {
+  const { apiCaller, makeURL } = this;
+
+  return apiCaller().put(makeURL("/v1/channel/unAssignApiToChannel"), body);
+};
+
+// @query
+getAll = (key, params: getAllProps) => {
+  const { apiCaller, makeURL } = this;
+
+  return apiCaller().get(makeURL("/v1/channels", { params }));
+};
+
+// @mutation
+changeStatus = (body: changeStatusProps) => {
+  const { apiCaller, makeURL } = this;
+
+  return apiCaller().put(makeURL("/v1/channels/changeStatus"), body);
+};
+
+// @query
+getByFilter = (key, params: getByFilterProps) => {
+  const { apiCaller, makeURL } = this;
+
+  return apiCaller().get(makeURL("/v1/channels/getByFilter", { params }));
+};

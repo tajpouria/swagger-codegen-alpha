@@ -63,7 +63,10 @@ export class Generator {
       SingletonWriterPropsProvider.addImports(imports);
       const writerProps = SingletonWriterPropsProvider.produceWriterProps();
 
-      await new Writer(writerProps).write();
+      await new Writer(writerProps)
+        .concatImportToWriteContent()
+        .formatWriteContent()
+        .write();
     } catch (err) {
       console.error(err);
     }
