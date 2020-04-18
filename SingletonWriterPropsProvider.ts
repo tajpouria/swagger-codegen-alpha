@@ -1,14 +1,30 @@
-import { WriteContent, WriterProps } from './Writer';
+import { WritePartition, WriterProps } from './Writer';
 import { flatten, isObject, createMd5 } from './utils';
 import { WrappedObject } from './plugin-helpers';
 
 export abstract class SingletonWriterPropsProvider {
   static imports: Set<string> = new Set();
-  static writeContent: WriteContent = new Map();
+  static writePartitions: Record<string, WritePartition> = {};
   static wrappedWriteContent: Map<
     string,
     Map<string, WrappedObject>
   > = new Map();
+
+  static createWritePartitons = (partitions: string[]) => {
+    const { writePartitions: writePartions } = SingletonWriterPropsProvider;
+
+    partitions.forEach(par => {
+      if (!writePartions[par]) {
+        writePartions[par] = new Map();
+      }
+    });
+
+    return Object.values(writePartions).map(targetWritePartition =>
+      SingletonWriterPropsProvider.addContentToWritePartion(
+        targetWritePartition,
+      ),
+    );
+  };
 
   static addImports = (newimport: string | string[]) => {
     if (Array.isArray(newimport)) {
@@ -20,7 +36,7 @@ export abstract class SingletonWriterPropsProvider {
     return SingletonWriterPropsProvider;
   };
 
-  static addWriteContent = (
+  static addContentToWritePartion = (targetWritePartition: WritePartition) => (
     toAddFilePath: string,
     toAddContent: string | string[] | WrappedObject,
   ) => {
@@ -83,18 +99,14 @@ export abstract class SingletonWriterPropsProvider {
     }
 
     if (typeof toAddContentTemp === 'string') {
-      const { writeContent } = SingletonWriterPropsProvider;
-      const prevFileContent = writeContent.get(toAddFilePath);
+      const prevFileContent = targetWritePartition.get(toAddFilePath);
       if (prevFileContent) {
-        SingletonWriterPropsProvider.writeContent.set(
+        targetWritePartition.set(
           toAddFilePath,
           prevFileContent.concat('\n'.repeat(2)).concat(toAddContentTemp),
         );
       } else {
-        SingletonWriterPropsProvider.writeContent.set(
-          toAddFilePath,
-          toAddContentTemp,
-        );
+        targetWritePartition.set(toAddFilePath, toAddContentTemp);
       }
     }
 
@@ -104,38 +116,35 @@ export abstract class SingletonWriterPropsProvider {
   static produceWriterProps = (): WriterProps => {
     const {
       imports,
-      writeContent,
+      writePartitions,
       wrappedWriteContent,
     } = SingletonWriterPropsProvider;
 
-    wrappedWriteContent.forEach((wrapper, fileName) => {
-      let replacedWriteContent = '';
-      wrapper.forEach(
-        ({ wrapperStartWith, toWrapContent, wrapperEndWith }, wrapperKey) => {
-          const toReplaceWriteContent = writeContent.get(fileName);
+    Object.values(writePartitions).forEach(writePartition => {
+      wrappedWriteContent.forEach((wrapper, fileName) => {
+        let replacedWriteContent = '';
+        wrapper.forEach(
+          ({ wrapperStartWith, toWrapContent, wrapperEndWith }, wrapperKey) => {
+            const toReplaceWriteContent = writePartition.get(fileName);
 
-          if (toReplaceWriteContent) {
-            replacedWriteContent = toReplaceWriteContent?.replace(
-              new RegExp(wrapperKey, 'g'),
-              `${wrapperStartWith}\n${toWrapContent}\n${wrapperEndWith}`,
-            );
-          }
+            if (toReplaceWriteContent) {
+              replacedWriteContent = toReplaceWriteContent?.replace(
+                new RegExp(wrapperKey, 'g'),
+                `${wrapperStartWith}\n${toWrapContent}\n${wrapperEndWith}`,
+              );
+            }
 
-          if (replacedWriteContent !== toReplaceWriteContent) {
-            SingletonWriterPropsProvider.writeContent.set(
-              fileName,
-              replacedWriteContent,
-            );
-          }
-        },
-      );
+            if (replacedWriteContent !== toReplaceWriteContent) {
+              writePartition.set(fileName, replacedWriteContent);
+            }
+          },
+        );
+      });
     });
-
-    debugger;
 
     return {
       imports: [...imports].join('\n'),
-      writeContent,
+      writePartitions,
     };
   };
 }

@@ -64,8 +64,9 @@ export class Generator {
       const writerProps = SingletonWriterPropsProvider.produceWriterProps();
 
       await new Writer(writerProps)
+        .concatWritePatitions()
         .concatImportToWriteContent()
-        .formatWriteContent()
+        //.formatWriteContent()
         .write();
     } catch (err) {
       console.error(err);

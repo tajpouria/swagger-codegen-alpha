@@ -1,5 +1,3 @@
-import path from 'path';
-
 import { Parameter } from './Parser';
 import { SingletonWriterPropsProvider } from './SingletonWriterPropsProvider';
 
@@ -18,22 +16,8 @@ export function useQueryParmas(parameters: Parameter[]): [string[], string] {
   return [queryParams, consumeQueryParams];
 }
 
-export const useAddToFile = (addAllToDirectoryPath?: string) => (
-  toAddFilePath: string,
-  toAddContent: string | string[] | WrappedObject,
-) => {
-  if (addAllToDirectoryPath) {
-    SingletonWriterPropsProvider.addWriteContent(
-      path.resolve(addAllToDirectoryPath, toAddFilePath),
-      toAddContent,
-    );
-  } else {
-    SingletonWriterPropsProvider.addWriteContent(
-      path.resolve(toAddFilePath),
-      toAddContent,
-    );
-  }
-};
+export const useAddToWritePartition = (partitions: string[]) =>
+  SingletonWriterPropsProvider.createWritePartitons(partitions);
 
 export const wrap = (
   wrapperStartWith: string,

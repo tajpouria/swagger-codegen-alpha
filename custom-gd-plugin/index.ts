@@ -1,5 +1,10 @@
 import { Plugin } from '..';
-import { useQueryParmas, useAddToFile, wrap } from '../plugin-helpers';
+import {
+  useQueryParmas,
+  useAddToWritePartition,
+  wrap,
+} from '../plugin-helpers';
+import path from 'path';
 
 interface CostomGdPluginProps {
   tagNamesToInclude: string[];
@@ -12,18 +17,22 @@ export default function ({
 }: CostomGdPluginProps): Plugin {
   return {
     main: () => ([url]) => ([method, pathProps]) => {
-      const addToFile = useAddToFile(generatedDirectroyPath);
+      const [addToDefintion, addToController] = useAddToWritePartition([
+        'definition',
+        'controller',
+      ]);
+
       const { tags, summary, operationId } = pathProps;
 
       tags?.forEach(tag => {
         if (tagNamesToInclude.includes(tag)) {
-          const FILE_NAME = `${tag}.js`,
+          const FILE_PATH = path.resolve(generatedDirectroyPath, `${tag}.js`),
             METHOD_NAME = summary || operationId;
 
           switch (method) {
             case 'get':
-              addToFile(
-                FILE_NAME,
+              addToController(
+                FILE_PATH,
 
                 wrap(
                   `// @query
@@ -37,8 +46,8 @@ export default function ({
               break;
 
             case 'post':
-              addToFile(
-                FILE_NAME,
+              addToController(
+                FILE_PATH,
 
                 wrap(
                   `// @mutation
@@ -52,8 +61,8 @@ export default function ({
               break;
 
             case 'put':
-              addToFile(
-                FILE_NAME,
+              addToController(
+                FILE_PATH,
 
                 wrap(
                   `// @mutation
@@ -67,8 +76,8 @@ export default function ({
               break;
 
             case 'delete':
-              addToFile(
-                FILE_NAME,
+              addToController(
+                FILE_PATH,
 
                 wrap(
                   `// @mutation

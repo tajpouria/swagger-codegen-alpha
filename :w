@@ -13,33 +13,6 @@ export class Writer {
 
   constructor(private props: WriterProps) {}
 
-  public concatWritePatitions = () => {
-    const {
-      writeContent,
-      props: { writePartitions },
-    } = this;
-
-    Object.entries(writePartitions).forEach(([partionName, partitions]) => {
-      partitions.forEach((partVal, partFileName) => {
-        const previousWriteContent = writeContent.get(partFileName);
-
-        if (previousWriteContent) {
-          writeContent.set(
-            partFileName,
-            previousWriteContent.concat('\n'.repeat(2).concat(partVal)),
-          );
-        } else {
-          writeContent.set(
-            partFileName,
-            `//${partionName}`.concat('\n'.repeat(2)).concat(partVal),
-          );
-        }
-      });
-    });
-
-    return this;
-  };
-
   public concatImportToWriteContent = () => {
     const {
       writeContent,
@@ -47,7 +20,10 @@ export class Writer {
     } = this;
 
     writeContent.forEach((value, key) =>
-      writeContent.set(key, imports.concat('\n'.repeat(3)).concat(value)),
+      this.props.writeContent.set(
+        key,
+        imports.concat('\n'.repeat(3)).concat(value),
+      ),
     );
 
     return this;
@@ -68,11 +44,11 @@ export class Writer {
   };
 
   public async write() {
-    const { writeContent } = this;
+    const { writePartitions } = this.props;
 
     const writingPromises: Promise<void>[] = [];
 
-    writeContent.forEach((value, key) =>
+    writePartitions.a.forEach((value, key) =>
       writingPromises.push(
         writeFile(key, value, {
           encoding: 'utf-8',
