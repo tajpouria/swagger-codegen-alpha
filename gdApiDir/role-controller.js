@@ -1,63 +1,62 @@
 // @flow
-import { APIVersionController } from 'src/controller/APIVersionController';
+import { APIVersionController } from "src/controller/APIVersionController";
 
+//Definition
 
-//definition
+class RoleController extends APIVersionController {
+  // @query
+  getById = (key, params: getByIdProps) => {
+    const { apiCaller, makeURL } = this;
 
+    return apiCaller().get(makeURL("/v1/role", { params }));
+  };
 
+  // @mutation
+  add = (body: addProps) => {
+    const { apiCaller, makeURL } = this;
 
-// @query
-                  getById = (key, params: getByIdProps) => {
-const { apiCaller, makeURL } = this;
+    return apiCaller().post(makeURL("/v1/role"), body);
+  };
 
-                   return apiCaller().get(makeURL('/v1/role', { params }));
-}
+  // @mutation
+  edit = (body: editProps) => {
+    const { apiCaller, makeURL } = this;
 
-// @mutation
-                  add = (body: addProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().post(makeURL('/v1/role'), body);
-}
+    return apiCaller().put(makeURL("/v1/role"), body);
+  };
 
-// @mutation
-                  edit = (body: editProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/role'), body);
-}
+  // @mutation
+  delete = (key, params: deleteProps) => {
+    const { apiCaller, makeURL } = this;
 
-// @mutation
-                  delete = (body: deleteProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/role'), { params });
-}
+    return apiCaller().delete(makeURL("/v1/role", { params }));
+  };
 
-// @mutation
-                  editRolePermissions = (body: editRolePermissionsProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/role/editRolePermissions'), body);
-}
+  // @mutation
+  editRolePermissions = (body: editRolePermissionsProps) => {
+    const { apiCaller, makeURL } = this;
 
-// @query
-                  getAll = (key, params: getAllProps) => {
-const { apiCaller, makeURL } = this;
+    return apiCaller().put(makeURL("/v1/role/editRolePermissions"), body);
+  };
 
-                   return apiCaller().get(makeURL('/v1/roles', { params }));
-}
+  // @query
+  getAll = (key, params: getAllProps) => {
+    const { apiCaller, makeURL } = this;
 
-// @mutation
-                  changeStatus = (body: changeStatusProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/roles/changeStatus'), body);
-}
+    return apiCaller().get(makeURL("/v1/roles", { params }));
+  };
 
-// @query
-                  getByFilter = (key, params: getByFilterProps) => {
-const { apiCaller, makeURL } = this;
+  // @mutation
+  changeStatus = (body: changeStatusProps) => {
+    const { apiCaller, makeURL } = this;
 
-                   return apiCaller().get(makeURL('/v1/roles/getByFilter', { params }));
+    return apiCaller().put(makeURL("/v1/roles/changeStatus"), body);
+  };
+
+  // @query
+  getByFilter = (key, params: getByFilterProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(makeURL("/v1/roles/getByFilter", { params }));
+  };
 }

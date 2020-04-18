@@ -66,7 +66,7 @@ export class Generator {
       await new Writer(writerProps)
         .concatWritePatitions()
         .concatImportToWriteContent()
-        //.formatWriteContent()
+        .formatWriteContent()
         .write();
     } catch (err) {
       console.error(err);

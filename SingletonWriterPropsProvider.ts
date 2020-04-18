@@ -1,6 +1,6 @@
 import { WritePartition, WriterProps } from './Writer';
-import { flatten, isObject, createMd5 } from './utils';
-import { WrappedObject } from './plugin-helpers';
+import { flatten, createMd5 } from './utils';
+import { WrappedObject, isInstanceOfWrappedObject } from './plugin-helpers';
 
 export abstract class SingletonWriterPropsProvider {
   static imports: Set<string> = new Set();
@@ -20,7 +20,7 @@ export abstract class SingletonWriterPropsProvider {
     });
 
     return Object.values(writePartions).map(targetWritePartition =>
-      SingletonWriterPropsProvider.addContentToWritePartion(
+      SingletonWriterPropsProvider.addContentToWritePartition(
         targetWritePartition,
       ),
     );
@@ -36,61 +36,65 @@ export abstract class SingletonWriterPropsProvider {
     return SingletonWriterPropsProvider;
   };
 
-  static addContentToWritePartion = (targetWritePartition: WritePartition) => (
+  static addContentToWritePartition = (
+    targetWritePartition: WritePartition,
+  ) => (
     toAddFilePath: string,
     toAddContent: string | string[] | WrappedObject,
   ) => {
     let toAddContentTemp = toAddContent;
 
-    if (isObject(toAddContentTemp)) {
-      const {
-        wrapperStartWith,
-        wrapperEndWith,
-        toWrapContent,
-      } = toAddContentTemp as WrappedObject;
+    let wrapperKey = '';
+    if (isInstanceOfWrappedObject(toAddContentTemp)) {
+      while (isInstanceOfWrappedObject(toAddContentTemp.toWrapContent)) {
+        toAddContentTemp.toWrapContent = SingletonWriterPropsProvider.addContentToWritePartition(
+          targetWritePartition,
+        )(toAddFilePath, {
+          ...toAddContentTemp.toWrapContent,
+          wrapperLevel: toAddContentTemp.toWrapContent.wrapperLevel + 1,
+        });
+      }
 
-      if (Array.isArray(toWrapContent)) {
-        (toAddContentTemp as WrappedObject).toWrapContent = flatten(
-          toWrapContent,
+      if (Array.isArray(toAddContentTemp.toWrapContent)) {
+        toAddContentTemp.toWrapContent = flatten(
+          toAddContentTemp.toWrapContent,
         ).join('\n'.repeat(2));
       }
 
-      const wrapperKey = createMd5(
-        JSON.stringify({ wrapperStartWith, wrapperEndWith }),
+      wrapperKey = createMd5(
+        JSON.stringify({
+          wrapperStartWith: toAddContentTemp.wrapperStartWith,
+          wrapperEndWith: toAddContentTemp.wrapperEndWith,
+        }),
       );
 
       const { wrappedWriteContent } = SingletonWriterPropsProvider;
 
       const wrapperFile = wrappedWriteContent.get(toAddFilePath);
-      const prevWrapper = wrapperFile?.get(wrapperKey) as
-        | Map<string, WrappedObject>
-        | undefined;
+      const prevWrapper = wrapperFile?.get(wrapperKey);
 
-      if (prevWrapper) {
-        const previousWrappedContent =
-          prevWrapper.get(wrapperKey)?.toWrapContent || '';
+      if (wrapperFile && prevWrapper) {
+        const previousWrappedContent = prevWrapper.toWrapContent as string;
 
-        prevWrapper.set(wrapperKey, {
-          ...(prevWrapper.get(wrapperKey) as WrappedObject),
+        wrapperFile.set(wrapperKey, {
+          ...prevWrapper,
 
-          toWrapContent: previousWrappedContent.concat(
-            (toAddContentTemp as WrappedObject).toWrapContent as string,
-          ),
+          toWrapContent: previousWrappedContent
+            .concat('\n'.repeat(3))
+            .concat(toAddContentTemp.toWrapContent),
         });
-
-        toAddContentTemp = '';
       } else if (wrapperFile) {
         wrapperFile.set(wrapperKey, toAddContentTemp as WrappedObject);
 
-        toAddContentTemp = wrapperKey;
+        toAddContentTemp = !toAddContentTemp.wrapperLevel ? wrapperKey : '';
       } else {
-        const wrapperMap = new Map<string, WrappedObject>();
+        const wrapper = new Map<string, WrappedObject>();
 
-        wrapperMap.set(wrapperKey, toAddContentTemp as WrappedObject);
+        wrapper.set(wrapperKey, toAddContentTemp);
 
-        wrappedWriteContent.set(toAddFilePath, wrapperMap);
+        wrappedWriteContent.set(toAddFilePath, wrapper);
 
-        toAddContentTemp = wrapperKey;
+        toAddContentTemp = !toAddContentTemp.wrapperLevel ? wrapperKey : '';
       }
     } else if (Array.isArray(toAddContentTemp)) {
       toAddContentTemp = flatten(toAddContentTemp, Infinity).join(
@@ -110,7 +114,7 @@ export abstract class SingletonWriterPropsProvider {
       }
     }
 
-    return SingletonWriterPropsProvider;
+    return wrapperKey;
   };
 
   static produceWriterProps = (): WriterProps => {
@@ -119,6 +123,15 @@ export abstract class SingletonWriterPropsProvider {
       writePartitions,
       wrappedWriteContent,
     } = SingletonWriterPropsProvider;
+
+    // Sort WriteContents based on wrapperLevel
+    wrappedWriteContent.forEach((files, fileName) => {
+      const sortedWriteContent = [...files.entries()].sort(
+        (a, b) => a[1].wrapperLevel - b[1].wrapperLevel,
+      );
+
+      wrappedWriteContent.set(fileName, new Map(sortedWriteContent as any));
+    });
 
     Object.values(writePartitions).forEach(writePartition => {
       wrappedWriteContent.forEach((wrapper, fileName) => {
@@ -133,7 +146,6 @@ export abstract class SingletonWriterPropsProvider {
                 `${wrapperStartWith}\n${toWrapContent}\n${wrapperEndWith}`,
               );
             }
-
             if (replacedWriteContent !== toReplaceWriteContent) {
               writePartition.set(fileName, replacedWriteContent);
             }

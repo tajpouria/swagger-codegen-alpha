@@ -21,16 +21,31 @@ export const useAddToWritePartition = (partitions: string[]) =>
 
 export const wrap = (
   wrapperStartWith: string,
-  toWrapContent: string | string[],
+  toWrapContent: string | string[] | WrappedObject,
   wrapperEndWith: string,
+  wrapperLevel: number = 0,
 ): WrappedObject => ({
   wrapperStartWith,
   wrapperEndWith,
   toWrapContent,
+  wrapperLevel,
 });
 
 export interface WrappedObject {
   wrapperStartWith: string;
   wrapperEndWith: string;
-  toWrapContent: string | string[];
+  toWrapContent: string | string[] | WrappedObject;
+  wrapperLevel: number;
+}
+
+export function isInstanceOfWrappedObject(
+  object: any,
+): object is WrappedObject {
+  return (
+    typeof object === 'object' &&
+    'wrapperStartWith' in object &&
+    'wrapperEndWith' in object &&
+    'toWrapContent' in object &&
+    'wrapperLevel' in object
+  );
 }

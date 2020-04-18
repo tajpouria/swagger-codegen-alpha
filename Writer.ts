@@ -56,12 +56,12 @@ export class Writer {
   public formatWriteContent = (
     prettierOptions: PrettierOptions = { parser: 'babel' },
   ) => {
-    const { writePartitions } = this.props;
+    const { writeContent } = this;
 
-    writePartitions.a.forEach((value, key) => {
+    writeContent.forEach((value, key) => {
       const formattedContent = prettier.format(value, prettierOptions);
 
-      writePartitions.a.set(key, formattedContent);
+      writeContent.set(key, formattedContent);
     });
 
     return this;
