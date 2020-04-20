@@ -1,6 +1,6 @@
 import { Plugin } from '..';
 import {
-  useQueryParmas,
+  parseParametersInfo,
   useAddToWritePartition,
   wrap,
 } from '../plugin-helpers';
@@ -29,11 +29,19 @@ export default function ({
 
       const { tags, summary, operationId, parameters } = pathProps;
 
+      const paramsInfo = parseParametersInfo(parameters);
+
+      console.log(paramsInfo);
+
       tags?.forEach(tag => {
         if (tagNamesToInclude.includes(tag)) {
           const FILE_PATH = path.resolve(generatedDirectroyPath, `${tag}.js`),
             CONTOROLLER_NAME = capitalizeFirstLetter(hypensToCamelCase(tag)),
-            METHOD_NAME = summary || operationId;
+            METHOD_NAME = summary || operationId,
+            METHOD_PROPS_NAME = `${capitalizeFirstLetter(
+              summary || operationId || '',
+            )}Props`,
+            CONTOROLLER_INSTANCE_NAME = hypensToCamelCase(tag);
 
           switch (method) {
             case 'get':
@@ -45,7 +53,7 @@ export default function ({
 
                   wrap(
                     `// @query
-                  ${METHOD_NAME} = (key, params: ${METHOD_NAME}Props) => {`,
+                  ${METHOD_NAME} = (key, params: ${METHOD_PROPS_NAME}) => {`,
 
                     `const { apiCaller, makeURL } = this;
 
@@ -54,7 +62,10 @@ export default function ({
                     `}`,
                   ),
 
-                  `}`,
+                  `}
+
+                  export const ${CONTOROLLER_INSTANCE_NAME} = new ${CONTOROLLER_NAME}();
+                  `,
                 ),
               );
               break;
@@ -68,7 +79,7 @@ export default function ({
 
                   wrap(
                     `// @mutation
-                  ${METHOD_NAME} = (body: ${METHOD_NAME}Props) => {`,
+                  ${METHOD_NAME} = (body: ${METHOD_PROPS_NAME}) => {`,
 
                     `const { apiCaller, makeURL } = this;
                     
@@ -77,7 +88,10 @@ export default function ({
                     `}`,
                   ),
 
-                  `}`,
+                  `}
+
+                  export const ${CONTOROLLER_INSTANCE_NAME} = new ${CONTOROLLER_NAME}();
+                  `,
                 ),
               );
               break;
@@ -91,7 +105,7 @@ export default function ({
 
                   wrap(
                     `// @mutation
-                  ${METHOD_NAME} = (body: ${METHOD_NAME}Props) => {`,
+                  ${METHOD_NAME} = (body: ${METHOD_PROPS_NAME}) => {`,
 
                     `const { apiCaller, makeURL } = this;
                     
@@ -100,7 +114,10 @@ export default function ({
                     `}`,
                   ),
 
-                  `}`,
+                  `}
+
+                  export const ${CONTOROLLER_INSTANCE_NAME} = new ${CONTOROLLER_NAME}();
+                  `,
                 ),
               );
               break;
@@ -114,7 +131,7 @@ export default function ({
 
                   wrap(
                     `// @mutation
-                  ${METHOD_NAME} = (key, params: ${METHOD_NAME}Props) => {`,
+                  ${METHOD_NAME} = (key, params: ${METHOD_PROPS_NAME}) => {`,
 
                     `const { apiCaller, makeURL } = this;
 
@@ -123,7 +140,10 @@ export default function ({
                     `}`,
                   ),
 
-                  `}`,
+                  `}
+
+                  export const ${CONTOROLLER_INSTANCE_NAME} = new ${CONTOROLLER_NAME}();
+                  `,
                 ),
               );
 

@@ -1,12 +1,12 @@
 import { Plugin } from '..';
-import { useQueryParmas } from '../plugin-helpers';
+import { useQueryParams } from '../plugin-helpers';
 
 export default function (config = {}): Plugin {
   return {
     main: ({ basePath, host }) => ([url]) => ([method, pathProps]) => {
       const { operationId, parameters } = pathProps;
 
-      const [queryParams, consumeQueryParams] = useQueryParmas(parameters);
+      const [queryParams, consumeQueryParams] = useQueryParams(parameters);
 
       switch (method) {
         case 'get':

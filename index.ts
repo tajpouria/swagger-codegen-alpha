@@ -17,7 +17,7 @@ export interface Plugin {
   ) => (
     urlPath: [string, Path],
   ) => (methodPathProps: [MethodType, PathProps]) => any;
-  imports: string | string[];
+  imports?: string | string[];
 }
 
 type GeneratorProps = RequireOnlyOne<

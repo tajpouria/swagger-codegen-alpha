@@ -3,62 +3,64 @@ import { APIVersionController } from "src/controller/APIVersionController";
 
 //Definition
 
-class RoleController extends APIVersionController {
+class OrganizationController extends APIVersionController {
   // @query
   getById = (key, params: GetByIdProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().get(makeURL("/v1/role", { params }));
+    return apiCaller().get(makeURL("/v1/organization", { params }));
   };
 
   // @mutation
   add = (body: AddProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().post(makeURL("/v1/role"), body);
+    return apiCaller().post(makeURL("/v1/organization"), body);
   };
 
   // @mutation
   edit = (body: EditProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().put(makeURL("/v1/role"), body);
+    return apiCaller().put(makeURL("/v1/organization"), body);
   };
 
   // @mutation
   delete = (key, params: DeleteProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().delete(makeURL("/v1/role", { params }));
+    return apiCaller().delete(makeURL("/v1/organization", { params }));
   };
 
-  // @mutation
-  editRolePermissions = (body: EditRolePermissionsProps) => {
+  // @query
+  getOrganizationsByRoleId = (key, params: GetOrganizationsByRoleIdProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().put(makeURL("/v1/role/editRolePermissions"), body);
+    return apiCaller().get(makeURL("/v1/organization/getByRoleId", { params }));
   };
 
   // @query
   getAll = (key, params: GetAllProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().get(makeURL("/v1/roles", { params }));
+    return apiCaller().get(makeURL("/v1/organizations", { params }));
   };
 
   // @mutation
   changeStatus = (body: ChangeStatusProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().put(makeURL("/v1/roles/changeStatus"), body);
+    return apiCaller().put(makeURL("/v1/organizations/changeStatus"), body);
   };
 
   // @query
   getByFilter = (key, params: GetByFilterProps) => {
     const { apiCaller, makeURL } = this;
 
-    return apiCaller().get(makeURL("/v1/roles/getByFilter", { params }));
+    return apiCaller().get(
+      makeURL("/v1/organizations/getByFilter", { params })
+    );
   };
 }
 
-export const roleController = new RoleController();
+export const organizationController = new OrganizationController();

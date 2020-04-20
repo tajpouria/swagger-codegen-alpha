@@ -26,11 +26,24 @@ export interface PathProps {
 export interface Parameter {
   name: string;
   in: ParameterType;
+  type?: ParameterDataType;
+
+  required?: boolean;
 }
+
+export type ParameterDataType =
+  | 'object'
+  | 'string'
+  | 'boolean'
+  | 'number'
+  | 'integer'
+  | 'array'
+  | 'enum'
+  | 'schema';
 
 export type MethodType = 'get' | 'post' | 'put' | 'delete' | 'patch';
 
-type ParameterType = 'query' | 'path' | 'body';
+export type ParameterType = 'query' | 'path' | 'body' | 'header';
 
 export class Parser {
   private _schema: SwaggerSchema;

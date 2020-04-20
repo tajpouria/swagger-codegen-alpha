@@ -26,7 +26,7 @@ export abstract class SingletonWriterPropsProvider {
     );
   };
 
-  static addImports = (newimport: string | string[]) => {
+  static addImports = (newimport: string | string[] = '') => {
     if (Array.isArray(newimport)) {
       newimport.forEach(imp => SingletonWriterPropsProvider.addImports(imp));
     } else {

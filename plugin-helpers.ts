@@ -1,20 +1,6 @@
-import { Parameter } from './Parser';
+import { Parameter, ParameterType } from './Parser';
 import { SingletonWriterPropsProvider } from './SingletonWriterPropsProvider';
-
-export function useQueryParmas(parameters: Parameter[]): [string[], string] {
-  const queryParams: string[] = [];
-
-  parameters.forEach(par => par.in === 'query' && queryParams.push(par.name));
-
-  const consumeQueryParams = `\${qs({${queryParams.reduce(
-    (acc, qp) => `${acc} ${qp},`,
-    '',
-  )}})}`;
-
-  SingletonWriterPropsProvider.addImports("import qs from 'qs'");
-
-  return [queryParams, consumeQueryParams];
-}
+import { resolveParameterInfo, ParamterInfo } from './paramHelpers';
 
 export const useAddToWritePartition = (partitions: string[]) =>
   SingletonWriterPropsProvider.createWritePartitons(partitions);
@@ -49,3 +35,26 @@ export function isInstanceOfWrappedObject(
     'wrapperLevel' in object
   );
 }
+
+export const parseParametersInfo = (
+  parametes: Parameter[],
+): {
+  [paramType in ParameterType]: ParamterInfo[];
+} => {
+  const parametersInfo: { [paramType in ParameterType]: ParamterInfo[] } = {
+    query: [],
+    path: [],
+    body: [],
+    header: [],
+  };
+
+  parametes.forEach(parameter => {
+    const previousParamInfo = parametersInfo[parameter.in];
+
+    parametersInfo[parameter.in] = previousParamInfo.concat(
+      resolveParameterInfo(parameter),
+    );
+  });
+
+  return parametersInfo;
+};
