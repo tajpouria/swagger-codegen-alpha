@@ -1,114 +1,160 @@
 // @flow
-import { APIVersionController } from "src/controller/APIVersionController";
+import { APIVersionController } from 'src/controller/APIVersionController';
+
 
 //Definition
 
 interface GetByIdProps {
-  id: ?number;
-}
+id: ? number;
 
-interface GetAllProps {}
+};
+
+interface EditProps {
+apiEditRequest:  ;
+
+};
+
+interface SetupProps {
+
+};
+
+interface GetAllProps {
+
+};
+
+interface ChangeApisPermissionLevelProps {
+changeEntityStatusRequest:  ;
+
+};
+
+interface ChangeApisStatusProps {
+changeEntityStatusRequest:  ;
+
+};
 
 interface GetAggregatorApiChannelsByTitleProps {
-  title: ?string;
-}
+title: ? string;
+
+};
 
 interface GetAggregatorApisByChannelIdProps {
-  channelId: ?number;
-}
+channelId: ? number;
+
+};
 
 interface GetByFilterProps {
-  active: ?boolean;
-  deleted: ?boolean;
-  method: ?string;
-  page: ?number;
-  publicAccess: ?boolean;
-  title: ?string;
-  url: ?string;
-}
+active: ? boolean;
+deleted: ? boolean;
+method: ? string;
+page: ? number;
+publicAccess: ? boolean;
+title: ? string;
+url: ? string;
+
+};
 
 interface GetAggregatorApisByTitleProps {
-  title: ?string;
-}
+title: ? string;
+
+};
 
 class ApiController extends APIVersionController {
-  // @query
-  getById = (key, params: GetByIdProps) => {
-    const { apiCaller, makeURL } = this;
+// @query
+                  getById = (key, params: GetByIdProps) => {
+const { apiCaller, makeURL } = this;
 
-    return apiCaller().get(makeURL("/v1/api", { params }));
-  };
-
-  // @mutation
-  edit = (body: EditProps) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().put(makeURL("/v1/api"), body);
-  };
-
-  // @mutation
-  setup = (body: SetupProps) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().put(makeURL("/v1/api/setup"), body);
-  };
-
-  // @query
-  getAll = (key, params: GetAllProps) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().get(makeURL("/v1/apis", { params }));
-  };
-
-  // @mutation
-  changeApisPermissionLevel = (body: ChangeApisPermissionLevelProps) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().put(makeURL("/v1/apis/changePermissionLevel"), body);
-  };
-
-  // @mutation
-  changeApisStatus = (body: ChangeApisStatusProps) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().put(makeURL("/v1/apis/changeStatus"), body);
-  };
-
-  // @query
-  getAggregatorApiChannelsByTitle = (
-    key,
-    params: GetAggregatorApiChannelsByTitleProps
-  ) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().get(
-      makeURL("/v1/apis/getApiChannelByTitle", { params })
-    );
-  };
-
-  // @query
-  getAggregatorApisByChannelId = (
-    key,
-    params: GetAggregatorApisByChannelIdProps
-  ) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().get(makeURL("/v1/apis/getByChannelId", { params }));
-  };
-
-  // @query
-  getByFilter = (key, params: GetByFilterProps) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().get(makeURL("/v1/apis/getByFilter", { params }));
-  };
-
-  // @query
-  getAggregatorApisByTitle = (key, params: GetAggregatorApisByTitleProps) => {
-    const { apiCaller, makeURL } = this;
-
-    return apiCaller().get(makeURL("/v1/apis/getByTitle", { params }));
-  };
+                   return apiCaller().get(makeURL('/v1/api', { params }));
 }
 
-export const apiController = new ApiController();
+
+// @mutation
+                  edit = (body: EditProps) => {
+const { apiCaller, makeURL } = this;
+                    
+                  return apiCaller().put(makeURL('/v1/api'), body);
+}
+
+
+// @mutation
+                  setup = (body: SetupProps) => {
+const { apiCaller, makeURL } = this;
+                    
+                  return apiCaller().put(makeURL('/v1/api/setup'), body);
+}
+
+
+// @query
+                  getAll = (key, params: GetAllProps) => {
+const { apiCaller, makeURL } = this;
+
+                   return apiCaller().get(makeURL('/v1/apis', { params }));
+}
+
+
+// @mutation
+                  changeApisPermissionLevel = (body: ChangeApisPermissionLevelProps) => {
+const { apiCaller, makeURL } = this;
+                    
+                  return apiCaller().put(makeURL('/v1/apis/changePermissionLevel'), body);
+}
+
+
+// @mutation
+                  changeApisStatus = (body: ChangeApisStatusProps) => {
+const { apiCaller, makeURL } = this;
+                    
+                  return apiCaller().put(makeURL('/v1/apis/changeStatus'), body);
+}
+
+
+// @query
+                  getAggregatorApiChannelsByTitle = (key, params: GetAggregatorApiChannelsByTitleProps) => {
+const { apiCaller, makeURL } = this;
+
+                   return apiCaller().get(makeURL('/v1/apis/getApiChannelByTitle', { params }));
+}
+
+
+// @query
+                  getAggregatorApisByChannelId = (key, params: GetAggregatorApisByChannelIdProps) => {
+const { apiCaller, makeURL } = this;
+
+                   return apiCaller().get(makeURL('/v1/apis/getByChannelId', { params }));
+}
+
+
+// @query
+                  getByFilter = (key, params: GetByFilterProps) => {
+const { apiCaller, makeURL } = this;
+
+                   return apiCaller().get(makeURL('/v1/apis/getByFilter', { params }));
+}
+
+
+// @query
+                  getAggregatorApisByTitle = (key, params: GetAggregatorApisByTitleProps) => {
+const { apiCaller, makeURL } = this;
+
+                   return apiCaller().get(makeURL('/v1/apis/getByTitle', { params }));
+}
+}
+
+                  export const apiController = new ApiController();
+                  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

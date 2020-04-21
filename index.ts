@@ -6,6 +6,7 @@ import {
   PathProps,
   Path,
   SwaggerSchema,
+  parser,
 } from './Parser';
 import { RequireOnlyOne } from './utils';
 import { schemaProvider } from './schemaProvider';
@@ -47,7 +48,7 @@ export class Generator {
         await schemaProvider({ schemaPath, schemaURL }),
       ) as SwaggerSchema;
 
-      const parser = new Parser(jsonSchema);
+      parser.schema = jsonSchema;
 
       const {
         host,
@@ -73,7 +74,7 @@ export class Generator {
       await new Writer(writerProps)
         .concatWritePatitions()
         .concatImportToWriteContent()
-        .formatWriteContent(prettierOptions)
+        //.formatWriteContent(prettierOptions)
         .write();
     } catch (err) {
       console.error(err);

@@ -1,4 +1,6 @@
 import { Plugin } from '..';
+import { ParameterType } from '../Parser';
+import { ParamterInfo } from '../paramHelpers';
 import {
   parseParametersInfo,
   useAddToWritePartition,
@@ -47,16 +49,9 @@ export default function ({
                 FILE_PATH,
                 wrap(
                   `interface ${METHOD_PROPS_NAME} {`,
-                  paramsInfo.query.reduce(
-                    (acc, q) =>
-                      q
-                        ? acc.concat(
-                            `${q.name}: ${!q.required ? '?' : ''} ${q.type};\n`,
-                          )
-                        : acc,
 
-                    '',
-                  ),
+                  paramsTointerfaceContent(paramsInfo, 'query'),
+
                   `};`,
                 ),
               );
@@ -87,6 +82,17 @@ export default function ({
               break;
 
             case 'post':
+              addToDefintion(
+                FILE_PATH,
+                wrap(
+                  `interface ${METHOD_PROPS_NAME} {`,
+
+                  paramsTointerfaceContent(paramsInfo, 'body'),
+
+                  `};`,
+                ),
+              );
+
               addToController(
                 FILE_PATH,
 
@@ -113,6 +119,17 @@ export default function ({
               break;
 
             case 'put':
+              addToDefintion(
+                FILE_PATH,
+                wrap(
+                  `interface ${METHOD_PROPS_NAME} {`,
+
+                  paramsTointerfaceContent(paramsInfo, 'body'),
+
+                  `};`,
+                ),
+              );
+
               addToController(
                 FILE_PATH,
 
@@ -139,6 +156,17 @@ export default function ({
               break;
 
             case 'delete':
+              addToDefintion(
+                FILE_PATH,
+                wrap(
+                  `interface ${METHOD_PROPS_NAME} {`,
+
+                  paramsTointerfaceContent(paramsInfo, 'query'),
+
+                  `};`,
+                ),
+              );
+
               addToController(
                 FILE_PATH,
 
@@ -177,4 +205,16 @@ function hypensToCamelCase(str: string) {
 
 function capitalizeFirstLetter(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function paramsTointerfaceContent(
+  paramsInfo: ReturnType<typeof parseParametersInfo>,
+  paramType: ParameterType,
+) {
+  return paramsInfo[paramType].reduce(
+    (acc, q) =>
+      q ? acc.concat(`${q.name}: ${!q.required ? '?' : ''} ${q.type};\n`) : acc,
+
+    '',
+  );
 }

@@ -6,6 +6,7 @@ export interface OverallProps {
 
 export interface SwaggerSchema extends OverallProps {
   paths: Paths;
+  definitions: any;
 }
 
 export interface Paths {
@@ -29,12 +30,16 @@ export interface Parameter {
   type?: ParameterDataType;
   required?: boolean;
   enum?: (string | number)[];
-  schema?: any;
-  properties?: Record<string, ParamaterProperty>;
+  schema?: ParamaterPropertyAndPramaterSchema;
+  properties?: Record<string, ParamaterPropertyAndPramaterSchema>;
+  $ref?: string;
+  items?: ParamaterPropertyAndPramaterSchema;
 }
 
-export interface ParamaterProperty {
-  type: ParameterDataType;
+interface ParamaterPropertyAndPramaterSchema {
+  $ref?: string;
+  type?: ParameterDataType;
+  properties?: Record<string, ParamaterPropertyAndPramaterSchema>;
 }
 
 export type ParameterDataType =
@@ -52,9 +57,10 @@ export type MethodType = 'get' | 'post' | 'put' | 'delete' | 'patch';
 export type ParameterType = 'query' | 'path' | 'body' | 'header';
 
 export class Parser {
+  // @ts-ignore
   private _schema: SwaggerSchema;
 
-  constructor(inputSchema: SwaggerSchema) {
+  public set schema(inputSchema: SwaggerSchema) {
     this._schema = inputSchema;
   }
 
@@ -84,3 +90,5 @@ export class Parser {
     return this;
   };
 }
+
+export const parser = new Parser();

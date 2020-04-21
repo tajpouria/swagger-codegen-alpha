@@ -1,8 +1,8 @@
-import { Parameter, ParameterDataType } from './Parser';
+import { Parameter, ParameterDataType, parser } from './Parser';
 
 //@ts-ignore
 export function resolveParameterInfo(parameter: Parameter): ParamterInfo {
-  const { name, type, required, schema } = parameter;
+  const { name, type, required, schema, $ref } = parameter;
 
   const paramInfo = { name, required: resolveParameterInfoRequired(required) };
 
@@ -16,18 +16,31 @@ export function resolveParameterInfo(parameter: Parameter): ParamterInfo {
       ...paramInfo,
       type: resolveParameterInfoPrimitiveType(type),
     };
-    //} else if (type === 'object') {
-    //return {
-    //...paramInfo,
-    //type: resolveParameterInfoObjectType(parameter),
-    //};
-    //} else if (schema) {
-    //return {
-    //...paramInfo,
-    ////@ts-ignore
-    //type: resolveParameterInfoSchemaType(parameter),
-    //};
+  } else if (type === 'object') {
+    return {
+      ...paramInfo,
+      type: resolveParameterInfoObjectType(parameter),
+    };
+  } else if (type === 'array') {
+    return {
+      ...paramInfo,
+      //@ts-ignore
+      type: resolveParameterInfoArrayType(parameter),
+    };
+  } else if (schema) {
+    return {
+      ...paramInfo,
+      type: resolveParameterInfoSchemaType(parameter),
+    };
+  } else if ($ref) {
+    return {
+      ...paramInfo,
+      //@ts-ignore
+      type: resolveParameterInfo$ref(parameter),
+    };
   }
+
+  throw new Error(`Cannot resolve Parameter ${name}`);
 }
 
 export interface ParamterInfo {
@@ -69,8 +82,52 @@ function resolveParameterInfoPrimitiveType(type: ParameterDataType) {
   }
 }
 
-// @ts-ignore
-function resolveParameterInfoObjectType(parameter) {}
+function resolveParameterInfoObjectType(parameter: Parameter) {
+  const { properties } = parameter;
 
-// @ts-ignore
-function resolveParameterInfoSchemaType(schema) {}
+  if (properties) {
+    return Object.entries(properties).map(([propName, prop]) =>
+      resolveParameterInfo({ name: propName, in: parameter.in, ...prop }),
+    );
+  }
+
+  return [];
+}
+
+function resolveParameterInfoArrayType(parameter: Parameter) {
+  const { items } = parameter;
+
+  if (items) {
+    // @ts-ignore
+    return resolveParameterInfo(items);
+  }
+
+  return [];
+}
+
+function resolveParameterInfoSchemaType(parameter: Parameter) {
+  const { schema } = parameter;
+
+  if (schema) {
+    //@ts-ignore
+    resolveParameterInfo({ ...schema, in: parameter.in });
+  }
+
+  return [];
+}
+
+function resolveParameterInfo$ref(parameter: Parameter) {
+  const { $ref } = parameter;
+  const schema = parser.schema;
+
+  if ($ref && schema) {
+    const refSegments = $ref.split('/');
+    const refName = refSegments[refSegments.length - 1];
+
+    const parameter = schema.definitions?.[refName];
+
+    return resolveParameterInfo(parameter);
+  }
+
+  return [];
+}
