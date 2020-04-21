@@ -3,6 +3,25 @@ import { APIVersionController } from "src/controller/APIVersionController";
 
 //Definition
 
+interface GetChannelProps {
+  id: ?number;
+}
+
+interface GetChannelConsumersProps {
+  id: ?number;
+}
+
+interface GetAllProps {}
+
+interface GetByFilterProps {
+  active: ?boolean;
+  creationDateFrom: ?number;
+  creationDateTo: ?number;
+  deleted: ?boolean;
+  page: ?number;
+  title: ?string;
+}
+
 class ChannelController extends APIVersionController {
   // @query
   getChannel = (key, params: GetChannelProps) => {

@@ -3,6 +3,8 @@ import { APIVersionController } from "src/controller/APIVersionController";
 
 //Definition
 
+interface GetAllProps {}
+
 class TagController extends APIVersionController {
   // @mutation
   add = (body: AddProps) => {

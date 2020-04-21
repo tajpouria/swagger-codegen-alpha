@@ -3,6 +3,22 @@ import { APIVersionController } from "src/controller/APIVersionController";
 
 //Definition
 
+interface GetByIdProps {
+  id: ?number;
+}
+
+interface GetAllProps {}
+
+interface GetByFilterProps {
+  active: ?boolean;
+  creationDateFrom: ?number;
+  creationDateTo: ?number;
+  key: ?string;
+  organizationId: ?number;
+  page: ?number;
+  title: ?string;
+}
+
 class RoleController extends APIVersionController {
   // @query
   getById = (key, params: GetByIdProps) => {

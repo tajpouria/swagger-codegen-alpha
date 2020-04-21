@@ -3,6 +3,40 @@ import { APIVersionController } from "src/controller/APIVersionController";
 
 //Definition
 
+interface GetByIdProps {
+  id: ?number;
+}
+
+interface GetDeletableStatusProps {
+  id: number;
+}
+
+interface GetMenuApiChannelByUserIdProps {}
+
+interface GetAllProps {}
+
+interface GetByParentIdProps {
+  parentId: ?number;
+}
+
+interface GetByFilterProps {
+  active: ?boolean;
+  applicationId: ?number;
+  menuTypeId: ?number;
+  page: ?number;
+  parentId: ?number;
+  publicMenu: ?boolean;
+  title: ?string;
+}
+
+interface GetByMenuTypeIdProps {
+  menuTypeId: ?number;
+}
+
+interface GetMenusByUserIdProps {
+  application: ?string;
+}
+
 class MenuController extends APIVersionController {
   // @query
   getById = (key, params: GetByIdProps) => {

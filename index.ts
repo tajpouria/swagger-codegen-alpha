@@ -1,3 +1,4 @@
+import { Options as PrettierOptions } from 'prettier';
 import {
   Parser,
   OverallProps,
@@ -25,6 +26,7 @@ type GeneratorProps = RequireOnlyOne<
     schemaURL: string;
     schemaPath: string;
     plugin: Plugin;
+    prettierOptions?: PrettierOptions;
   },
   'schemaPath' | 'schemaURL'
 >;
@@ -33,7 +35,12 @@ export class Generator {
   constructor(private generatorProps: GeneratorProps) {}
 
   public async generate() {
-    const { schemaPath, plugin, schemaURL } = this.generatorProps;
+    const {
+      schemaPath,
+      plugin,
+      schemaURL,
+      prettierOptions,
+    } = this.generatorProps;
 
     try {
       const jsonSchema = JSON.parse(
@@ -66,7 +73,7 @@ export class Generator {
       await new Writer(writerProps)
         .concatWritePatitions()
         .concatImportToWriteContent()
-        .formatWriteContent()
+        .formatWriteContent(prettierOptions)
         .write();
     } catch (err) {
       console.error(err);

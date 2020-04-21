@@ -27,8 +27,14 @@ export interface Parameter {
   name: string;
   in: ParameterType;
   type?: ParameterDataType;
-
   required?: boolean;
+  enum?: (string | number)[];
+  schema?: any;
+  properties?: Record<string, ParamaterProperty>;
+}
+
+export interface ParamaterProperty {
+  type: ParameterDataType;
 }
 
 export type ParameterDataType =

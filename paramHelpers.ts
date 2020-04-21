@@ -2,16 +2,43 @@ import { Parameter, ParameterDataType } from './Parser';
 
 //@ts-ignore
 export function resolveParameterInfo(parameter: Parameter): ParamterInfo {
-  const { name, type, required } = parameter;
+  const { name, type, required, schema } = parameter;
 
-  if (isPrimitiveParamterInfoType(type)) {
+  const paramInfo = { name, required: resolveParameterInfoRequired(required) };
+
+  if (parameter.enum) {
     return {
-      name,
-      type: resolveParameterInfoPrimitiveType(type),
-      required: resolveParameterInfoRequired(required),
+      ...paramInfo,
+      type: parameter.enum,
     };
+  } else if (isPrimitiveParamterInfoType(type)) {
+    return {
+      ...paramInfo,
+      type: resolveParameterInfoPrimitiveType(type),
+    };
+    //} else if (type === 'object') {
+    //return {
+    //...paramInfo,
+    //type: resolveParameterInfoObjectType(parameter),
+    //};
+    //} else if (schema) {
+    //return {
+    //...paramInfo,
+    ////@ts-ignore
+    //type: resolveParameterInfoSchemaType(parameter),
+    //};
   }
 }
+
+export interface ParamterInfo {
+  name: string;
+  type: PrimitiveParamterInfoType | (string | number)[] | ParamterInfo[];
+  required: boolean;
+}
+
+const resolveParameterInfoRequired = (required?: boolean) => !!required;
+
+type PrimitiveParamterInfoType = 'string' | 'number' | 'boolean';
 
 function isPrimitiveParamterInfoType(
   type: any,
@@ -42,12 +69,8 @@ function resolveParameterInfoPrimitiveType(type: ParameterDataType) {
   }
 }
 
-const resolveParameterInfoRequired = (required?: boolean) => !!required;
+// @ts-ignore
+function resolveParameterInfoObjectType(parameter) {}
 
-type PrimitiveParamterInfoType = 'string' | 'number' | 'boolean';
-
-export interface ParamterInfo {
-  name: string;
-  type: PrimitiveParamterInfoType | ParamterInfo;
-  required: boolean;
-}
+// @ts-ignore
+function resolveParameterInfoSchemaType(schema) {}

@@ -3,6 +3,34 @@ import { APIVersionController } from "src/controller/APIVersionController";
 
 //Definition
 
+interface GetByIdProps {
+  id: ?number;
+}
+
+interface GetAllProps {}
+
+interface GetAggregatorApiChannelsByTitleProps {
+  title: ?string;
+}
+
+interface GetAggregatorApisByChannelIdProps {
+  channelId: ?number;
+}
+
+interface GetByFilterProps {
+  active: ?boolean;
+  deleted: ?boolean;
+  method: ?string;
+  page: ?number;
+  publicAccess: ?boolean;
+  title: ?string;
+  url: ?string;
+}
+
+interface GetAggregatorApisByTitleProps {
+  title: ?string;
+}
+
 class ApiController extends APIVersionController {
   // @query
   getById = (key, params: GetByIdProps) => {

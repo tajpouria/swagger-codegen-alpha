@@ -16,6 +16,7 @@ import gdPlugin from './custom-gd-plugin';
       ],
       generatedDirectroyPath: './gdApiDir',
     }),
+    prettierOptions: { parser: 'babel-flow' },
   });
 
   await gen.generate();

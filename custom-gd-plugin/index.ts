@@ -31,8 +31,6 @@ export default function ({
 
       const paramsInfo = parseParametersInfo(parameters);
 
-      console.log(paramsInfo);
-
       tags?.forEach(tag => {
         if (tagNamesToInclude.includes(tag)) {
           const FILE_PATH = path.resolve(generatedDirectroyPath, `${tag}.js`),
@@ -45,6 +43,24 @@ export default function ({
 
           switch (method) {
             case 'get':
+              addToDefintion(
+                FILE_PATH,
+                wrap(
+                  `interface ${METHOD_PROPS_NAME} {`,
+                  paramsInfo.query.reduce(
+                    (acc, q) =>
+                      q
+                        ? acc.concat(
+                            `${q.name}: ${!q.required ? '?' : ''} ${q.type};\n`,
+                          )
+                        : acc,
+
+                    '',
+                  ),
+                  `};`,
+                ),
+              );
+
               addToController(
                 FILE_PATH,
 
