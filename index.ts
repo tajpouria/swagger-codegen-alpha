@@ -1,6 +1,5 @@
 import { Options as PrettierOptions } from 'prettier';
 import {
-  Parser,
   OverallProps,
   MethodType,
   PathProps,
@@ -74,7 +73,7 @@ export class Generator {
       await new Writer(writerProps)
         .concatWritePatitions()
         .concatImportToWriteContent()
-        //.formatWriteContent(prettierOptions)
+        .formatWriteContent(prettierOptions)
         .write();
     } catch (err) {
       console.error(err);

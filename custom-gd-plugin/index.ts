@@ -41,7 +41,8 @@ export default function ({
             METHOD_PROPS_NAME = `${capitalizeFirstLetter(
               summary || operationId || '',
             )}Props`,
-            CONTOROLLER_INSTANCE_NAME = hypensToCamelCase(tag);
+            CONTOROLLER_INSTANCE_NAME = hypensToCamelCase(tag),
+            URL = removeVersionFromUrl(url);
 
           switch (method) {
             case 'get':
@@ -68,7 +69,7 @@ export default function ({
 
                     `const { apiCaller, makeURL } = this;
 
-                   return apiCaller().get(makeURL('${url}', { params }));`,
+                   return apiCaller().get(makeURL('${URL}', { params }));`,
 
                     `}`,
                   ),
@@ -105,7 +106,7 @@ export default function ({
 
                     `const { apiCaller, makeURL } = this;
                     
-                  return apiCaller().post(makeURL('${url}'), body);`,
+                  return apiCaller().post(makeURL('${URL}'), body);`,
 
                     `}`,
                   ),
@@ -142,7 +143,7 @@ export default function ({
 
                     `const { apiCaller, makeURL } = this;
                     
-                  return apiCaller().put(makeURL('${url}'), body);`,
+                  return apiCaller().put(makeURL('${URL}'), body);`,
 
                     `}`,
                   ),
@@ -179,7 +180,7 @@ export default function ({
 
                     `const { apiCaller, makeURL } = this;
 
-                   return apiCaller().delete(makeURL('${url}', { params }));`,
+                   return apiCaller().delete(makeURL('${URL}', { params }));`,
 
                     `}`,
                   ),
@@ -199,6 +200,16 @@ export default function ({
   };
 }
 
+function removeVersionFromUrl(url: string, versionKeyWord = 'v1') {
+  const splittedUrl = url.split('/');
+
+  if (splittedUrl[1] === versionKeyWord) {
+    splittedUrl.splice(1, 1);
+  }
+
+  return splittedUrl.join('/');
+}
+
 function hypensToCamelCase(str: string) {
   return str.replace(/-([a-z])/g, g => g[1].toUpperCase());
 }
@@ -211,7 +222,14 @@ function paramsTointerfaceContent(
   paramsInfo: ReturnType<typeof parseParametersInfo>,
   paramType: ParameterType,
 ) {
-  return paramsInfo[paramType].reduce(
+  let targetParams = paramsInfo[paramType];
+
+  if (paramType === 'body' && Array.isArray(targetParams[0]?.type)) {
+    //@ts-ignore
+    targetParams = targetParams[0].type;
+  }
+
+  return targetParams.reduce(
     (acc, q) =>
       q ? acc.concat(`${q.name}: ${!q.required ? '?' : ''} ${q.type};\n`) : acc,
 

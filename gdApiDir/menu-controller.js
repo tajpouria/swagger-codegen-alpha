@@ -1,220 +1,185 @@
 // @flow
-import { APIVersionController } from 'src/controller/APIVersionController';
-
+import { APIVersionController } from "src/controller/APIVersionController";
 
 //Definition
 
 interface GetByIdProps {
-id: ? number;
-
-};
+  id: ?number;
+}
 
 interface AddProps {
-menuAddRequest:  ;
-
-};
+  active: ?boolean;
+  icon: ?string;
+  key: ?string;
+  menuTypeId: ?number;
+  parentId: ?number;
+  path: ?string;
+  publicMenu: ?boolean;
+  sort: ?number;
+  title: ?string;
+}
 
 interface EditProps {
-menuEditRequest:  ;
-
-};
+  icon: ?string;
+  id: ?number;
+  key: ?string;
+  menuTypeId: ?number;
+  parentId: ?number;
+  path: ?string;
+  publicMenu: ?boolean;
+  sort: ?number;
+  title: ?string;
+}
 
 interface DeleteProps {
-id:  number;
-
-};
+  id: number;
+}
 
 interface AssignApiChannelsProps {
-menuAssignApiChannelsRequest:  ;
-
-};
+  apiChannelId: ?number;
+  menuId: ?number;
+}
 
 interface ChangeMenuStatusProps {
-menuChangeStatusRequest:  ;
-
-};
+  active: ?boolean;
+  id: ?number;
+}
 
 interface GetDeletableStatusProps {
-id:  number;
+  id: number;
+}
 
-};
-
-interface GetMenuApiChannelByUserIdProps {
-
-};
+interface GetMenuApiChannelByUserIdProps {}
 
 interface UnAssignApiChannelsProps {
-menuAssignApiChannelsRequest:  ;
+  apiChannelId: ?number;
+  menuId: ?number;
+}
 
-};
-
-interface GetAllProps {
-
-};
+interface GetAllProps {}
 
 interface GetByParentIdProps {
-parentId: ? number;
-
-};
+  parentId: ?number;
+}
 
 interface GetByFilterProps {
-active: ? boolean;
-applicationId: ? number;
-menuTypeId: ? number;
-page: ? number;
-parentId: ? number;
-publicMenu: ? boolean;
-title: ? string;
-
-};
+  active: ?boolean;
+  applicationId: ?number;
+  menuTypeId: ?number;
+  page: ?number;
+  parentId: ?number;
+  publicMenu: ?boolean;
+  title: ?string;
+}
 
 interface GetByMenuTypeIdProps {
-menuTypeId: ? number;
-
-};
+  menuTypeId: ?number;
+}
 
 interface GetMenusByUserIdProps {
-application: ? string;
-
-};
+  application: ?string;
+}
 
 class MenuController extends APIVersionController {
-// @query
-                  getById = (key, params: GetByIdProps) => {
-const { apiCaller, makeURL } = this;
+  // @query
+  getById = (key, params: GetByIdProps) => {
+    const { apiCaller, makeURL } = this;
 
-                   return apiCaller().get(makeURL('/v1/menu', { params }));
+    return apiCaller().get(makeURL("/menu", { params }));
+  };
+
+  // @mutation
+  add = (body: AddProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().post(makeURL("/menu"), body);
+  };
+
+  // @mutation
+  edit = (body: EditProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().put(makeURL("/menu"), body);
+  };
+
+  // @mutation
+  delete = (key, params: DeleteProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().delete(makeURL("/menu", { params }));
+  };
+
+  // @mutation
+  assignApiChannels = (body: AssignApiChannelsProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().put(makeURL("/menu/assignApiChannels"), body);
+  };
+
+  // @mutation
+  changeMenuStatus = (body: ChangeMenuStatusProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().put(makeURL("/menu/changeStatus"), body);
+  };
+
+  // @query
+  getDeletableStatus = (key, params: GetDeletableStatusProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(makeURL("/menu/getDeletableStatus", { params }));
+  };
+
+  // @query
+  getMenuApiChannelByUserId = (key, params: GetMenuApiChannelByUserIdProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(
+      makeURL("/menu/getMenuApiChannelByUserId", { params })
+    );
+  };
+
+  // @mutation
+  unAssignApiChannels = (body: UnAssignApiChannelsProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().put(makeURL("/menu/unAssignApiChannels"), body);
+  };
+
+  // @query
+  getAll = (key, params: GetAllProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(makeURL("/menus", { params }));
+  };
+
+  // @query
+  getByParentId = (key, params: GetByParentIdProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(makeURL("/menus/", { params }));
+  };
+
+  // @query
+  getByFilter = (key, params: GetByFilterProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(makeURL("/menus/getByFilter", { params }));
+  };
+
+  // @query
+  getByMenuTypeId = (key, params: GetByMenuTypeIdProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(makeURL("/menus/getByMenuTypeId", { params }));
+  };
+
+  // @query
+  getMenusByUserId = (key, params: GetMenusByUserIdProps) => {
+    const { apiCaller, makeURL } = this;
+
+    return apiCaller().get(makeURL("/menus/getByUserId", { params }));
+  };
 }
 
-
-// @mutation
-                  add = (body: AddProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().post(makeURL('/v1/menu'), body);
-}
-
-
-// @mutation
-                  edit = (body: EditProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/menu'), body);
-}
-
-
-// @mutation
-                  delete = (key, params: DeleteProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().delete(makeURL('/v1/menu', { params }));
-}
-
-
-// @mutation
-                  assignApiChannels = (body: AssignApiChannelsProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/menu/assignApiChannels'), body);
-}
-
-
-// @mutation
-                  changeMenuStatus = (body: ChangeMenuStatusProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/menu/changeStatus'), body);
-}
-
-
-// @query
-                  getDeletableStatus = (key, params: GetDeletableStatusProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().get(makeURL('/v1/menu/getDeletableStatus', { params }));
-}
-
-
-// @query
-                  getMenuApiChannelByUserId = (key, params: GetMenuApiChannelByUserIdProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().get(makeURL('/v1/menu/getMenuApiChannelByUserId', { params }));
-}
-
-
-// @mutation
-                  unAssignApiChannels = (body: UnAssignApiChannelsProps) => {
-const { apiCaller, makeURL } = this;
-                    
-                  return apiCaller().put(makeURL('/v1/menu/unAssignApiChannels'), body);
-}
-
-
-// @query
-                  getAll = (key, params: GetAllProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().get(makeURL('/v1/menus', { params }));
-}
-
-
-// @query
-                  getByParentId = (key, params: GetByParentIdProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().get(makeURL('/v1/menus/', { params }));
-}
-
-
-// @query
-                  getByFilter = (key, params: GetByFilterProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().get(makeURL('/v1/menus/getByFilter', { params }));
-}
-
-
-// @query
-                  getByMenuTypeId = (key, params: GetByMenuTypeIdProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().get(makeURL('/v1/menus/getByMenuTypeId', { params }));
-}
-
-
-// @query
-                  getMenusByUserId = (key, params: GetMenusByUserIdProps) => {
-const { apiCaller, makeURL } = this;
-
-                   return apiCaller().get(makeURL('/v1/menus/getByUserId', { params }));
-}
-}
-
-                  export const menuController = new MenuController();
-                  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export const menuController = new MenuController();

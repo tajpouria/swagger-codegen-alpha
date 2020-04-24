@@ -29,17 +29,17 @@ export interface Parameter {
   in: ParameterType;
   type?: ParameterDataType;
   required?: boolean;
-  enum?: (string | number)[];
-  schema?: ParamaterPropertyAndPramaterSchema;
-  properties?: Record<string, ParamaterPropertyAndPramaterSchema>;
+  enum?: string[];
+  schema?: ParamaterPropertyAndParameterSchema;
+  properties?: Record<string, ParamaterPropertyAndParameterSchema>;
   $ref?: string;
-  items?: ParamaterPropertyAndPramaterSchema;
+  items?: ParamaterPropertyAndParameterSchema;
 }
 
-interface ParamaterPropertyAndPramaterSchema {
+interface ParamaterPropertyAndParameterSchema {
   $ref?: string;
   type?: ParameterDataType;
-  properties?: Record<string, ParamaterPropertyAndPramaterSchema>;
+  properties?: Record<string, ParamaterPropertyAndParameterSchema>;
 }
 
 export type ParameterDataType =

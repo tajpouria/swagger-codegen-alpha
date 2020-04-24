@@ -1,52 +1,59 @@
-import { Parameter, ParameterDataType, parser } from './Parser';
+import { Parameter, parser } from './Parser';
 
-//@ts-ignore
-export function resolveParameterInfo(parameter: Parameter): ParamterInfo {
-  const { name, type, required, schema, $ref } = parameter;
+type ResolveParameterInfoInputParamter = Omit<Parameter, 'in'>;
 
-  const paramInfo = { name, required: resolveParameterInfoRequired(required) };
+export function resolveParameterInfo(
+  parameter: ResolveParameterInfoInputParamter,
+): ParamterInfo {
+  const { name, required } = parameter;
 
-  if (parameter.enum) {
-    return {
-      ...paramInfo,
-      type: parameter.enum,
-    };
-  } else if (isPrimitiveParamterInfoType(type)) {
-    return {
-      ...paramInfo,
-      type: resolveParameterInfoPrimitiveType(type),
-    };
-  } else if (type === 'object') {
-    return {
-      ...paramInfo,
-      type: resolveParameterInfoObjectType(parameter),
-    };
-  } else if (type === 'array') {
-    return {
-      ...paramInfo,
-      //@ts-ignore
-      type: resolveParameterInfoArrayType(parameter),
-    };
-  } else if (schema) {
-    return {
-      ...paramInfo,
-      type: resolveParameterInfoSchemaType(parameter),
-    };
-  } else if ($ref) {
-    return {
-      ...paramInfo,
-      //@ts-ignore
-      type: resolveParameterInfo$ref(parameter),
-    };
-  }
+  const t = {
+    name,
+    required: resolveParameterInfoRequired(required),
+    type: resolveParameterInfoType(parameter),
+  };
 
-  throw new Error(`Cannot resolve Parameter ${name}`);
+  return t;
 }
 
 export interface ParamterInfo {
   name: string;
-  type: PrimitiveParamterInfoType | (string | number)[] | ParamterInfo[];
+  type: ParameterInfoType;
   required: boolean;
+}
+
+type ParameterInfoType = string | PrimitiveParamterInfoType | ParamterInfo[];
+
+function resolveParameterInfoType(
+  parameter: Partial<ResolveParameterInfoInputParamter>,
+): ParameterInfoType {
+  const { type, schema, $ref } = parameter;
+
+  if (parameter.enum) {
+    return resolveParameterInfoEnumType(parameter);
+  }
+
+  if (isPrimitiveParamterInfoType(type)) {
+    return resolveParameterInfoPrimitiveType(parameter);
+  }
+
+  if (type === 'object') {
+    return resolveParameterInfoObjectType(parameter);
+  }
+
+  if (type === 'array') {
+    return resolveParameterInfoArrayType(parameter);
+  }
+
+  if (schema) {
+    return resolveParameterInfoSchemaType(parameter);
+  }
+
+  if ($ref) {
+    return resolveParameterInfo$ref(parameter);
+  }
+
+  throw new Error(`Cannot resolve Parameter ${name}`);
 }
 
 const resolveParameterInfoRequired = (required?: boolean) => !!required;
@@ -65,7 +72,11 @@ function isPrimitiveParamterInfoType(
   );
 }
 
-function resolveParameterInfoPrimitiveType(type: ParameterDataType) {
+function resolveParameterInfoPrimitiveType(
+  parameter: Partial<ResolveParameterInfoInputParamter>,
+) {
+  const { type } = parameter;
+
   switch (type) {
     case 'string':
       return 'string';
@@ -78,45 +89,77 @@ function resolveParameterInfoPrimitiveType(type: ParameterDataType) {
       return 'boolean';
 
     default:
-      throw new Error(`Unknow PrimitiveParamterInfoType type ${type}!`);
+      return 'any';
   }
 }
 
-function resolveParameterInfoObjectType(parameter: Parameter) {
+function resolveParameterInfoEnumType(
+  parameter: Partial<ResolveParameterInfoInputParamter>,
+): string {
+  if (parameter.enum) {
+    return parameter.enum.reduce((acc, el) => {
+      if (acc) {
+        return `${acc}|'${el}'`;
+      }
+
+      return `'${el}'`;
+    }, '');
+  }
+
+  return 'any';
+}
+
+function resolveParameterInfoObjectType(
+  parameter: Partial<ResolveParameterInfoInputParamter>,
+) {
   const { properties } = parameter;
 
   if (properties) {
     return Object.entries(properties).map(([propName, prop]) =>
-      resolveParameterInfo({ name: propName, in: parameter.in, ...prop }),
+      resolveParameterInfo({ name: propName, ...prop }),
     );
   }
 
-  return [];
+  return 'any';
 }
 
-function resolveParameterInfoArrayType(parameter: Parameter) {
+function resolveParameterInfoArrayType(
+  parameter: Partial<ResolveParameterInfoInputParamter>,
+) {
   const { items } = parameter;
 
   if (items) {
-    // @ts-ignore
-    return resolveParameterInfo(items);
+    const type = resolveParameterInfoType(items);
+
+    // TODO: Should changed to more general approach this kinda stuff should handled on client
+    if (isPrimitiveParamterInfoType(type)) {
+      return `${type}[]`;
+    } else if (Array.isArray(type)) {
+      return `{ ${type.reduce(
+        (acc, el) => `${acc}\n${el.name}:${el.type};`,
+        '',
+      )} }[]`;
+    }
   }
 
-  return [];
+  return 'any';
 }
 
-function resolveParameterInfoSchemaType(parameter: Parameter) {
+function resolveParameterInfoSchemaType(
+  parameter: Partial<ResolveParameterInfoInputParamter>,
+) {
   const { schema } = parameter;
 
   if (schema) {
-    //@ts-ignore
-    resolveParameterInfo({ ...schema, in: parameter.in });
+    return resolveParameterInfoType(schema);
   }
 
-  return [];
+  return 'any';
 }
 
-function resolveParameterInfo$ref(parameter: Parameter) {
+function resolveParameterInfo$ref(
+  parameter: Partial<ResolveParameterInfoInputParamter>,
+) {
   const { $ref } = parameter;
   const schema = parser.schema;
 
@@ -126,8 +169,8 @@ function resolveParameterInfo$ref(parameter: Parameter) {
 
     const parameter = schema.definitions?.[refName];
 
-    return resolveParameterInfo(parameter);
+    return resolveParameterInfoType(parameter);
   }
 
-  return [];
+  return 'any';
 }
