@@ -1,6 +1,6 @@
 {
   "name": "swagger-codegen-alpha",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "lib/index.js",
   "license": "MIT",
   "author": "Pouria Tajdivand<tajpouria.dev@gmail.com>",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tajpouria/rewrite-codegen-alpha"
+    "url": "git+https://github.com/tajpouria/swagger-codegen-alpha"
   },
   "keywords": [
     "swagger",
