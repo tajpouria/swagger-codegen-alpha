@@ -1,8 +1,8 @@
-import fs from 'fs';
-import http from 'http';
-import https from 'https';
+import * as fs from 'fs';
+import * as http from 'http';
+import * as https from 'https';
+import * as crypto from 'crypto';
 import { promisify } from 'util';
-import crypto from 'crypto';
 
 export function flatten<T = string>(arr: any, depth: number = 1): T[] {
   return depth > 0
@@ -32,14 +32,14 @@ export const getRequest = async (
 ) => {
   const lib = url.startsWith('https://') ? https : http;
   return new Promise((resolve, reject) => {
-    const req = lib.get(url, res => {
+    const req = lib.get(url, (res) => {
       if (res?.statusCode! < 200 || res?.statusCode! >= 300) {
         return reject(new Error(`Status Code: ${res.statusCode}`));
       }
 
       const data: any[] = [];
 
-      res.on('data', chunk => {
+      res.on('data', (chunk) => {
         data.push(chunk);
       });
 
